@@ -1,6 +1,7 @@
 package pl.agnusix.tictactoe.game;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class Field {
 
@@ -9,7 +10,15 @@ public class Field {
     public Field(State state) {
         this.state = state;
     }
+
+    public static Field emptyField() {
+        return new Field(State.EMPTY);
+    }
 //tu piszemy xD
+
+    public boolean isOccupied() {
+        return !State.EMPTY.equals(state);
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -40,6 +49,15 @@ public class Field {
 //        } else{
 //            state = State.O;
 //        }
+    }
+    public Optional<Sign> occupiedBy(){
+        if (State.EMPTY.equals(state)){
+            return Optional.empty();
+        }
+        Sign sign = State.X.equals(state) ?
+                Sign.X :
+                Sign.O;
+        return Optional.of(sign);
     }
 
 

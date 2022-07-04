@@ -14,9 +14,6 @@ public class Game{
 
     public void makeMove(Player player, Move move) throws InvalidMoveException {
         final var sign = players.get(player);
-        if (!board.isMovePossible(sign, move)) {
-            throw new InvalidMoveException();
-        }
         board.makeMove(sign, move);
     }
 

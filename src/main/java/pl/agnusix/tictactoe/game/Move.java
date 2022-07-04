@@ -6,9 +6,10 @@ public class Move {
     private Move(int field) {
         this.field = field;
     }
-    public int getMove(){
+    public int getField(){
         return field;
     }
+
     public static Move newMove(int field) throws InvalidMoveException {
         if (field < 0 || field > 8){
             throw new InvalidMoveException();
