@@ -7,7 +7,7 @@ import java.util.Optional;
 import static pl.agnusix.tictactoe.game.Field.emptyField;
 
 public class Board {
-    private List<Field> fields;
+    private final List<Field> fields;
 
     public Board(List<Field> fields) {
         this.fields = fields;
@@ -39,65 +39,37 @@ public class Board {
         fields.get(move.getField()).set(sign);
     }
 
-    private Optional<Sign> isFullHorizontaly(int n){
-        List<Sign> signs = new ArrayList<>();
-        for (int i = n; i< n+3; i++){
-            if(fields.get(i).occupiedBy().isEmpty()) {
-                return Optional.empty();
-            }
-            signs.add(fields.get(i).occupiedBy().get());
-        }
-        Sign firstSign = signs.get(0);
-        int counter = (int) signs.stream().filter(sign -> firstSign.equals(sign)).count();
-        return counter == 3 ? Optional.of(firstSign): Optional.empty(); //CO KIEDY REMIS?
-    }
-    private Optional<Sign> isFullVerticaly(int n){
-        List<Sign> signs = new ArrayList<>();
-        for (int i = n; i< n+7; i+=3){
-            if(fields.get(i).occupiedBy().isEmpty()) {
-                return Optional.empty();
-            }
-            signs.add(fields.get(i).occupiedBy().get());
-        }
-        Sign firstSign = signs.get(0);
-        int counter = (int) signs.stream().filter(sign -> firstSign.equals(sign)).count();
-        return counter == 3 ? Optional.of(firstSign): Optional.empty(); //CO KIEDY REMIS?
-    }
-    private Optional<Sign> isFullRightDiagonaly(int n){
-        List<Sign> signs = new ArrayList<>();
-        for (int i = n; i< n+9; i+=4){
-            if(fields.get(i).occupiedBy().isEmpty()) {
-                return Optional.empty();
-            }
-            signs.add(fields.get(i).occupiedBy().get());
-        }
-        Sign firstSign = signs.get(0);
-        int counter = (int) signs.stream().filter(sign -> firstSign.equals(sign)).count();
-        return counter == 3 ? Optional.of(firstSign): Optional.empty(); //CO KIEDY REMIS?
-    }
-    private Optional<Sign> isFullLeftDiagonaly(int n){
-        List<Sign> signs = new ArrayList<>();
-        for (int i = n; i< n+9; i+=2){
-            if(fields.get(i).occupiedBy().isEmpty()) {
-                return Optional.empty();
-            }
-            signs.add(fields.get(i).occupiedBy().get());
-        }
-        Sign firstSign = signs.get(0);
-        int counter = (int) signs.stream().filter(sign -> firstSign.equals(sign)).count();
-        return counter == 3 ? Optional.of(firstSign): Optional.empty(); //CO KIEDY REMIS?
-    }
 
-    public Optional<Player> getWinner(){
-        isFullHorizontaly(0);
-        isFullHorizontaly(3);
-        isFullHorizontaly(6);
-        isFullVerticaly(0);
-        isFullVerticaly(1);
-        isFullVerticaly(2);
-        isFullLeftDiagonaly(2);
-        isFullRightDiagonaly(0);
+    private Optional<Sign> check(int n, int k, int l){
+        List<Sign> signs = new ArrayList<>();
+        for (int i = n; i< n+k; i+=l){
+            if(fields.get(i).occupiedBy().isEmpty()) {
+                return Optional.empty();
+            }
+            signs.add(fields.get(i).occupiedBy().get());
+        }
+        Sign firstSign = signs.get(0);
+        int counter = (int) signs.stream()
+                .filter(firstSign::equals)
+                .count();
+        return counter == 3 ? Optional.of(firstSign): Optional.empty();
 
     }
 
+    public Optional<Sign> getWinner(){ //it returned Optional<Player> before
+        List<Optional<Sign>> winningLines = List.of(
+                check(0,3,1),   //firstLine
+                check(3,3,1),   //secondLine
+                check(6,3,1),   //thirdLine
+                check(0,7,3),   //firstColumn
+                check(1,7,3),   //secondColumn
+                check(2,7,3),   //thirdColumn
+                check(0, 9, 4), //rightDiagonal
+                check(2, 7, 2)  //leftDiagonal
+        );
+        return winningLines.stream()
+                .filter(Optional::isPresent)
+                .findFirst()
+                .orElse(Optional.empty());
+    }
 }

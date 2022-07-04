@@ -56,13 +56,4 @@ class BoardSpec extends Specification {
 //        thirdMovePossibility
         noExceptionThrown()
     }
-    def 'it is not possible to override the occupied field' (){
-        given:
-        def move = Move.newMove(1)
-        when:
-            board.makeMove(X, move)
-            board.makeMove(O, move)
-        then:
-            thrown(InvalidMoveException)
-    }
 }
