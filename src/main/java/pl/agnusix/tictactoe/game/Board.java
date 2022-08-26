@@ -19,16 +19,18 @@ public class Board {
         }
         return new Board (fields);
     }
-
-
-    private boolean isMovePossible(Sign sign, Move move) {
-        boolean isOccupied=fields.get(move.getField()).isOccupied();
+    public Sign turn (){
         int occupiedFieldsCount = (int) fields.stream()
                 .filter(Field::isOccupied)
                 .count();
-        Sign turn = occupiedFieldsCount % 2 == 0 ?
+        return occupiedFieldsCount % 2 == 0 ?
                 Sign.X :
                 Sign.O;
+    }
+
+    private boolean isMovePossible(Sign sign, Move move) {
+        boolean isOccupied=fields.get(move.getField()).isOccupied();
+        Sign turn = turn();
         return !isOccupied && turn.equals(sign);
     }
 
@@ -71,5 +73,16 @@ public class Board {
                 .filter(Optional::isPresent)
                 .findFirst()
                 .orElse(Optional.empty());
+    }
+
+    public List<String> boardStatus(){
+//        List<String> board = new ArrayList<>();
+//        for (int i = 0; i < fields.size(); i++) {
+//            board.add(fields.get(i).getState());
+//        }
+//        return board;
+        return fields.stream()
+                .map(Field::getState)
+                .toList();
     }
 }
