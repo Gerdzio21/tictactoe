@@ -31,13 +31,16 @@ public class Game{
     }
     public String getOpponentNick(String uid){
         return players.keySet().stream().
-                filter(player->player.getUID() != uid).
+                filter(player->!uid.equals(player.getUID())).
                 findAny().
                 get().
                 getNick();
     }
     public Sign getSign(String uid){
-        return players.get(uid);
+        return players.get(players.keySet().stream()
+                .filter(player -> uid.equals(player.getUID()))
+                .findAny()
+                .get());
     }
     public List<String> boardStatus(){
         return board.boardStatus();

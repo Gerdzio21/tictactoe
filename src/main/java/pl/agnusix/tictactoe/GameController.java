@@ -6,18 +6,65 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.agnusix.tictactoe.game.*;
 
-import java.util.List;
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/api/v1")
 @CrossOrigin(origins ="http://localhost:4200")
-public class QueueController {
+public class GameController {
     private final GameService gameService;
 
-    public QueueController(GameService gameService) {
+    public GameController(GameService gameService) {
         this.gameService = gameService;
     }
+
+    @CrossOrigin
+    @PostMapping("/register")
+    public ResponseEntity<UserParams> register(@RequestBody UserRegistrationParams request){
+        UserParams response = new UserParams();
+        response.setUid(gameService.addPlayer(request.getNick()));
+        return ResponseEntity.ok(response);
+        //return ResponseEntity.ok(gameService.addPlayer(request.getNick()));
+    }
+
+    @CrossOrigin
+    @GetMapping("/game")
+    public ResponseEntity<GameStatus> gameState(@RequestParam("uid") String uid){
+        var game = gameService.getPlayerGame(uid);
+        if (game.isEmpty()){
+            if (!gameService.isPlayerExsist(uid)){
+                return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+            }else {
+                return ResponseEntity.notFound().build();
+            }
+        }
+        return ResponseEntity.ok(new GameStatus(
+                game.get().getOpponentNick(uid),
+                game.get().getSign(uid),
+                game.get().getTurn(),
+                game.get().getWinner().toString(),
+                game.get().boardStatus()));
+        //return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).build();
+    }
+    @PostMapping("/game/move")
+    public ResponseEntity<String> makeMove(@RequestBody MovePostParams request) {
+        try {
+            gameService.makeMove(request.getUid(), request.getField());
+            return ResponseEntity.ok().build();
+        } catch (Exception e ) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @DeleteMapping("/game")
+    public ResponseEntity<String> deleteGame(@RequestBody UserParams request){
+        try{
+            gameService.deleteGame(request.getUid());
+            return ResponseEntity.ok().build();
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.noContent().build();
+        }
+    }
+
 
     public static class UserRegistrationParams {
         private String nick;
@@ -59,56 +106,7 @@ public class QueueController {
             this.field = field;
         }
     }
-
-
-
-
-
-    @CrossOrigin
-    @PostMapping("/register")
-    public ResponseEntity<UserParams> register(@RequestBody UserRegistrationParams request){
-        UserParams response = new UserParams();
-        response.setUid(gameService.addPlayer(request.getNick()));
-        return ResponseEntity.ok(response);
-        //return ResponseEntity.ok(gameService.addPlayer(request.getNick()));
-    }
-
-    @CrossOrigin
-    @GetMapping("/game")
-    public ResponseEntity<GameStatus> gameState(@RequestParam("uid") String uid){
-        var game = gameService.getPlayerGame(uid);
-        if (game.isEmpty()){
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(new GameStatus(
-                game.get().getOpponentNick(uid),
-                game.get().getSign(uid),
-                game.get().getTurn(),
-                game.get().getWinner().toString(),
-                game.get().boardStatus()));
-        //return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).build();
-    }
-    @PostMapping("/game/move")
-    public ResponseEntity<String> makeMove(@RequestBody MovePostParams request) {
-        try {
-            gameService.makeMove(request.getUid(), request.getField());
-            return ResponseEntity.ok().build();
-        } catch (Exception e ) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().build();
-        }
-    }
-    @DeleteMapping("/game")
-    public ResponseEntity<String> deleteGame(@RequestBody UserParams request){
-        try{
-            gameService.deleteGame(request.getUid());
-            return ResponseEntity.ok().build();
-        }catch (Exception e){
-            e.printStackTrace();
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-
-
 }
+
+
+

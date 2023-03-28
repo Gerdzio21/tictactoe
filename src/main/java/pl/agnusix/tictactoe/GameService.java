@@ -27,10 +27,22 @@ public class GameService {
         return uid;
     }
 
+    public boolean isPlayerExsist(String uid){
+        Optional<Player> playerRepresentative = players.stream().filter(player -> uid.equals(player.getUID())).findFirst();
+        return !playerRepresentative.isEmpty();
+    }
+
     public void createGame(Player player1, Player player2){
         var newGame = new Game(Map.of(player1, Sign.X,player2, Sign.O));
         System.out.println(newGame);
         games.add(newGame);
+    }
+    public void deleteGame(String uid) throws MissingObjectException{
+        Optional<Game> game = getPlayerGame(uid);
+        if (!game.isEmpty())
+            games.remove(game.get());
+        else
+            throw new MissingObjectException();
     }
     public void makeMove(String uid,int field) throws InvalidMoveException {
         Move fieldToMove = Move.newMove(field);
@@ -40,6 +52,8 @@ public class GameService {
     public Optional<Game> getPlayerGame(String uid){
         return games.stream().filter(game -> game.playerExist(uid)).findFirst();
     }
+
+
 
 
 

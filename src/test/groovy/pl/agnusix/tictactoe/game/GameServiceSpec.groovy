@@ -1,39 +1,23 @@
 package pl.agnusix.tictactoe.game
 
+import pl.agnusix.tictactoe.GameService
+import pl.agnusix.tictactoe.MissingObjectException
 import spock.lang.Specification
 
 import static pl.agnusix.tictactoe.game.Move.newMove
-import static pl.agnusix.tictactoe.game.Sign.*
+import static pl.agnusix.tictactoe.game.Sign.O
+import static pl.agnusix.tictactoe.game.Sign.X
 
-class GameSpec extends Specification {
-    def 'is player X won game when X won'(){
+class GameServiceSpec extends Specification {
+    def 'is not possible to delete game after deleting it'(){
         given:
-            Player player1 = new Player("Player X")
-            Player player2 = new Player("Player O")
-            Game game = new Game(Map.of(player1, X, player2, O))
+            GameService gameService = new GameService(new ArrayList<>(), new ArrayList<>())
         when:
-            game.makeMove(player1, newMove(0))
-            game.makeMove(player2, newMove(3))
-            game.makeMove(player1, newMove(1))
-            game.makeMove(player2, newMove(4))
-            game.makeMove(player1, newMove(2))
-            def xWon = game.isGameWon();
+            def uidX = gameService.addPlayer("Player X")
+            def uidO =gameService.addPlayer("Player O")
+            gameService.deleteGame(uidX)
+            gameService.deleteGame(uidO)
         then:
-            xWon
-    }
-    def 'is not possible to move after game ending'(){
-        given:
-            Player player1 = new Player("Player X")
-            Player player2 = new Player("Player O")
-            Game game = new Game(Map.of(player1, X, player2, O))
-        when:
-            game.makeMove(player1, newMove(0))
-            game.makeMove(player2, newMove(3))
-            game.makeMove(player1, newMove(1))
-            game.makeMove(player2, newMove(4))
-            game.makeMove(player1, newMove(2))
-            game.makeMove(player2, newMove(5))
-        then:
-            thrown(InvalidMoveException)
+            thrown(MissingObjectException)
     }
 }

@@ -1,4 +1,4 @@
-package pl.agnusix.tictactoe.game;
+package pl.agnusix.tictactoe;
 
-public class InvalidMoveException extends Exception {
+public class MissingObjectException extends Exception {
 }
