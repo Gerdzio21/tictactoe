@@ -59,12 +59,12 @@ public class Field {
                 Sign.O;
         return Optional.of(sign);
     }
-
-
+    public String getState(){
+        return state.name();
+    }
     private enum State{
         X,
         O,
         EMPTY
     }
-
 }
